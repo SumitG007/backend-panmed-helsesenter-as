@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema(
   {
@@ -202,7 +203,6 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 // Method to generate email verification token
 userSchema.methods.generateEmailVerificationToken = function () {
-  const crypto = require('crypto');
   const token = crypto.randomBytes(32).toString('hex');
   
   this.emailVerificationToken = crypto
@@ -216,7 +216,6 @@ userSchema.methods.generateEmailVerificationToken = function () {
 
 // Method to generate password reset token
 userSchema.methods.generatePasswordResetToken = function () {
-  const crypto = require('crypto');
   const token = crypto.randomBytes(32).toString('hex');
   
   this.passwordResetToken = crypto
