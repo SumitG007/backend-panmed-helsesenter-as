@@ -32,50 +32,50 @@ export const sendVerificationEmail = async (email, verificationToken, firstName 
   const mailOptions = {
     from: `"Panmed Helsesenter AS" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Verify Your Email Address - Panmed Helsesenter AS',
+    subject: 'Bekreft din e-postadresse - Panmed Helsesenter AS',
     html: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verify Your Email</title>
+        <title>Bekreft din e-postadresse</title>
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
           <h1 style="color: white; margin: 0;">Panmed Helsesenter AS</h1>
         </div>
         <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-          <h2 style="color: #333; margin-top: 0;">Hello ${firstName},</h2>
-          <p>Thank you for registering with Panmed Helsesenter AS. Please verify your email address to complete your registration and start using our platform.</p>
+          <h2 style="color: #333; margin-top: 0;">Hei ${firstName},</h2>
+          <p>Takk for at du registrerte deg hos Panmed Helsesenter AS. Vennligst bekreft din e-postadresse for å fullføre registreringen og begynne å bruke plattformen vår.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verificationUrl}" 
                style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-              Verify Email Address
+              Bekreft e-postadresse
             </a>
           </div>
-          <p style="color: #666; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:</p>
+          <p style="color: #666; font-size: 14px;">Hvis knappen ikke fungerer, kopier og lim inn denne lenken i nettleseren din:</p>
           <p style="color: #667eea; font-size: 12px; word-break: break-all;">${verificationUrl}</p>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 24 hours.</p>
-          <p style="color: #666; font-size: 14px;">If you didn't create an account, please ignore this email.</p>
+          <p style="color: #666; font-size: 14px; margin-top: 30px;">Denne lenken utløper om 24 timer.</p>
+          <p style="color: #666; font-size: 14px;">Hvis du ikke opprettet en konto, vennligst ignorer denne e-posten.</p>
           <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px; text-align: center;">© ${new Date().getFullYear()} Panmed Helsesenter AS. All rights reserved.</p>
+          <p style="color: #999; font-size: 12px; text-align: center;">© ${new Date().getFullYear()} Panmed Helsesenter AS. Alle rettigheter reservert.</p>
         </div>
       </body>
       </html>
     `,
     text: `
-      Hello ${firstName},
+      Hei ${firstName},
       
-      Thank you for registering with Panmed Helsesenter AS. Please verify your email address by clicking the link below:
+      Takk for at du registrerte deg hos Panmed Helsesenter AS. Vennligst bekreft din e-postadresse ved å klikke på lenken nedenfor:
       
       ${verificationUrl}
       
-      This link will expire in 24 hours.
+      Denne lenken utløper om 24 timer.
       
-      If you didn't create an account, please ignore this email.
+      Hvis du ikke opprettet en konto, vennligst ignorer denne e-posten.
       
-      © ${new Date().getFullYear()} Panmed Helsesenter AS. All rights reserved.
+      © ${new Date().getFullYear()} Panmed Helsesenter AS. Alle rettigheter reservert.
     `,
   };
 
@@ -98,53 +98,53 @@ export const sendPasswordResetEmail = async (email, resetToken, firstName = 'Use
   const mailOptions = {
     from: `"Panmed Helsesenter AS" <${process.env.SMTP_USER}>`,
     to: email,
-    subject: 'Reset Your Password - Panmed Helsesenter AS',
+    subject: 'Tilbakestill ditt passord - Panmed Helsesenter AS',
     html: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reset Your Password</title>
+        <title>Tilbakestill ditt passord</title>
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
           <h1 style="color: white; margin: 0;">Panmed Helsesenter AS</h1>
         </div>
         <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-          <h2 style="color: #333; margin-top: 0;">Hello ${firstName},</h2>
-          <p>We received a request to reset your password for your Panmed Helsesenter AS account.</p>
-          <p>Click the button below to reset your password:</p>
+          <h2 style="color: #333; margin-top: 0;">Hei ${firstName},</h2>
+          <p>Vi har mottatt en forespørsel om å tilbakestille passordet for din Panmed Helsesenter AS-konto.</p>
+          <p>Klikk på knappen nedenfor for å tilbakestille passordet ditt:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" 
                style="background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
-              Reset Password
+              Tilbakestill passord
             </a>
           </div>
-          <p style="color: #666; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:</p>
+          <p style="color: #666; font-size: 14px;">Hvis knappen ikke fungerer, kopier og lim inn denne lenken i nettleseren din:</p>
           <p style="color: #667eea; font-size: 12px; word-break: break-all;">${resetUrl}</p>
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">This link will expire in 1 hour.</p>
-          <p style="color: #666; font-size: 14px;">If you didn't request a password reset, please ignore this email. Your password will remain unchanged.</p>
+          <p style="color: #666; font-size: 14px; margin-top: 30px;">Denne lenken utløper om 1 time.</p>
+          <p style="color: #666; font-size: 14px;">Hvis du ikke ba om tilbakestilling av passord, vennligst ignorer denne e-posten. Passordet ditt forblir uendret.</p>
           <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-          <p style="color: #999; font-size: 12px; text-align: center;">© ${new Date().getFullYear()} Panmed Helsesenter AS. All rights reserved.</p>
+          <p style="color: #999; font-size: 12px; text-align: center;">© ${new Date().getFullYear()} Panmed Helsesenter AS. Alle rettigheter reservert.</p>
         </div>
       </body>
       </html>
     `,
     text: `
-      Hello ${firstName},
+      Hei ${firstName},
       
-      We received a request to reset your password for your Panmed Helsesenter AS account.
+      Vi har mottatt en forespørsel om å tilbakestille passordet for din Panmed Helsesenter AS-konto.
       
-      Click the link below to reset your password:
+      Klikk på lenken nedenfor for å tilbakestille passordet ditt:
       
       ${resetUrl}
       
-      This link will expire in 1 hour.
+      Denne lenken utløper om 1 time.
       
-      If you didn't request a password reset, please ignore this email. Your password will remain unchanged.
+      Hvis du ikke ba om tilbakestilling av passord, vennligst ignorer denne e-posten. Passordet ditt forblir uendret.
       
-      © ${new Date().getFullYear()} Panmed Helsesenter AS. All rights reserved.
+      © ${new Date().getFullYear()} Panmed Helsesenter AS. Alle rettigheter reservert.
     `,
   };
 

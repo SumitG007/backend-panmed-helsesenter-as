@@ -26,7 +26,7 @@ export const registerPatient = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists with this email address',
+        message: 'En bruker med denne e-postadressen eksisterer allerede',
       });
     }
 
@@ -60,7 +60,7 @@ export const registerPatient = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: 'Registrering fullført. Sjekk e-posten din for å bekrefte kontoen din.',
       data: {
         userId: user._id,
         email: user.email,
@@ -107,7 +107,7 @@ export const registerSpecialist = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists with this email address',
+        message: 'En bruker med denne e-postadressen eksisterer allerede',
       });
     }
 
@@ -147,7 +147,7 @@ export const registerSpecialist = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account. Your CV will be reviewed by admin.',
+      message: 'Registrering fullført. Sjekk e-posten din for å bekrefte kontoen din. CV-en din vil bli vurdert av admin.',
       data: {
         userId: user._id,
         email: user.email,
@@ -177,7 +177,7 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide email and password',
+        message: 'Vennligst oppgi e-postadresse og passord',
       });
     }
 
@@ -185,7 +185,7 @@ export const login = async (req, res) => {
     if (role && !['patient', 'specialist', 'admin'].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid role specified',
+        message: 'Ugyldig rolle spesifisert',
       });
     }
 
@@ -195,7 +195,7 @@ export const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Ugyldig e-postadresse eller passord',
       });
     }
 
@@ -203,7 +203,7 @@ export const login = async (req, res) => {
     if (!user.emailVerified) {
       return res.status(403).json({
         success: false,
-        message: 'Please verify your email address before logging in. Check your email for the verification link.',
+        message: 'Vennligst bekreft din e-postadresse før du logger inn. Sjekk e-posten din for bekreftelseslenken.',
       });
     }
 
@@ -211,7 +211,7 @@ export const login = async (req, res) => {
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
-        message: 'Your account has been deactivated. Please contact support.',
+        message: 'Kontoen din har blitt deaktivert. Vennligst kontakt support.',
       });
     }
 
@@ -219,7 +219,7 @@ export const login = async (req, res) => {
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
-        message: 'Your account has been blocked. Please contact support.',
+        message: 'Kontoen din har blitt blokkert. Vennligst kontakt support.',
       });
     }
 
@@ -229,7 +229,7 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Ugyldig e-postadresse eller passord',
       });
     }
 
@@ -245,9 +245,15 @@ export const login = async (req, res) => {
       const expectedRole = roleMapping[role] || role;
       
       if (user.role !== expectedRole) {
+        const roleNames = {
+          'patient': 'pasient',
+          'specialist': 'spesialist',
+          'admin': 'admin'
+        };
+        const roleName = roleNames[expectedRole] || role;
         return res.status(403).json({
           success: false,
-          message: `This account does not have ${role} access. Please login from the correct tab.`,
+          message: `Denne kontoen har ikke ${roleName} tilgang. Vennligst logg inn fra riktig fane.`,
         });
       }
     }
@@ -261,7 +267,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: 'Innlogging vellykket',
       data: {
         token,
         user: {
@@ -278,7 +284,7 @@ export const login = async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error during login',
+      message: 'Feil ved innlogging',
       error: error.message,
     });
   }
@@ -296,7 +302,7 @@ export const verifyEmail = async (req, res) => {
     if (!token) {
       return res.status(400).json({
         success: false,
-        message: 'Verification token is required',
+        message: 'Bekreftelseslenke er påkrevd',
       });
     }
 
@@ -312,7 +318,7 @@ export const verifyEmail = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired verification token',
+        message: 'Ugyldig eller utløpt bekreftelseslenke',
       });
     }
 
@@ -324,13 +330,13 @@ export const verifyEmail = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully. You can now login.',
+      message: 'E-post bekreftet. Du kan nå logge inn.',
     });
   } catch (error) {
     console.error('Email verification error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error verifying email',
+      message: 'Feil ved bekreftelse av e-post',
       error: error.message,
     });
   }
@@ -385,13 +391,13 @@ export const resendVerificationEmail = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Verification email sent successfully',
+      message: 'Bekreftelses-e-post sendt',
     });
   } catch (error) {
     console.error('Resend verification email error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error resending verification email',
+      message: 'Feil ved gjenutsending av bekreftelses-e-post',
       error: error.message,
     });
   }
@@ -431,19 +437,19 @@ export const forgotPassword = async (req, res) => {
 
       return res.status(500).json({
         success: false,
-        message: 'Error sending password reset email',
+        message: 'Feil ved sending av e-post for tilbakestilling av passord',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'If an account exists with this email, a password reset link has been sent.',
+      message: 'Hvis en konto eksisterer med denne e-postadressen, er en tilbakestillingslenke sendt.',
     });
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error processing forgot password request',
+      message: 'Feil ved behandling av glemt passord-forespørsel',
       error: error.message,
     });
   }
@@ -461,7 +467,7 @@ export const resetPassword = async (req, res) => {
     if (!token || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Token and password are required',
+        message: 'Lenke og passord er påkrevd',
       });
     }
 
@@ -477,7 +483,7 @@ export const resetPassword = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired reset token',
+        message: 'Ugyldig eller utløpt tilbakestillingslenke',
       });
     }
 
@@ -489,13 +495,13 @@ export const resetPassword = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Password reset successful. You can now login with your new password.',
+      message: 'Passord tilbakestilt. Du kan nå logge inn med ditt nye passord.',
     });
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error resetting password',
+      message: 'Feil ved tilbakestilling av passord',
       error: error.message,
     });
   }
