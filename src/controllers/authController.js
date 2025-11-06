@@ -171,13 +171,21 @@ export const registerSpecialist = async (req, res) => {
  */
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     // Validate email and password
     if (!email || !password) {
       return res.status(400).json({
         success: false,
         message: 'Please provide email and password',
+      });
+    }
+
+    // Validate role if provided
+    if (role && !['patient', 'specialist', 'admin'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role specified',
       });
     }
 
@@ -223,6 +231,25 @@ export const login = async (req, res) => {
         success: false,
         message: 'Invalid credentials',
       });
+    }
+
+    // Validate role if provided - check if user's role matches the requested role
+    if (role) {
+      const roleMapping = {
+        'patient': 'patient',
+        'specialist': 'specialist',
+        'admin': 'admin',
+        'users': 'patient' // Frontend uses 'users' for patient
+      };
+      
+      const expectedRole = roleMapping[role] || role;
+      
+      if (user.role !== expectedRole) {
+        return res.status(403).json({
+          success: false,
+          message: `This account does not have ${role} access. Please login from the correct tab.`,
+        });
+      }
     }
 
     // Update last login

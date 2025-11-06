@@ -228,6 +228,11 @@ export const validateLogin = [
     .notEmpty()
     .withMessage('Password is required'),
   
+  body('role')
+    .optional()
+    .isIn(['patient', 'specialist', 'admin', 'users'])
+    .withMessage('Invalid role specified'),
+  
   handleValidationErrors,
 ];
 
