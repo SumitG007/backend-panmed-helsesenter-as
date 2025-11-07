@@ -100,6 +100,7 @@ export const registerSpecialist = async (req, res) => {
       workExperience,
       education,
       languages,
+      profileImage,
     } = req.body;
 
     // Check if user already exists
@@ -130,6 +131,8 @@ export const registerSpecialist = async (req, res) => {
       workExperience: workExperience || [],
       education: education || [],
       languages: languages || [],
+      profileImageUrl: profileImage || '',
+      profileImageStatus: profileImage ? 'pending' : 'pending',
       cvStatus: 'pending',
     });
 
