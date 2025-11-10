@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/emailService.js';
+import crypto from 'crypto';
 
 /**
  * @desc    Get all users (Admin only)
@@ -307,6 +308,287 @@ export const sendVerificationEmailToUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error sending verification email',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Get all admin users (Admin only)
+ * @route   GET /api/admin/admin-users
+ * @access  Private/Admin
+ */
+export const getAllAdminUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: 'admin' })
+      .select('-password -emailVerificationToken -emailVerificationTokenExpiry -passwordResetToken -passwordResetTokenExpiry')
+      .sort({ createdAt: -1 });
+    
+    const transformedUsers = users.map(user => ({
+      id: user._id.toString(),
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email,
+      phone: user.phone || '',
+      role: user.adminRole || 'admin',
+      permissions: [], // We'll handle permissions separately if needed
+      status: user.isBlocked ? 'suspended' : (user.isActive ? 'active' : 'inactive'),
+      lastLogin: user.lastLogin || null,
+      createdAt: user.createdAt,
+      createdBy: 'System', // We can track this if needed
+      department: user.department || '',
+      notes: user.notes || '',
+      emailVerified: user.emailVerified || false,
+    }));
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        users: transformedUsers,
+        total: transformedUsers.length,
+      },
+    });
+  } catch (error) {
+    console.error('Get all admin users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching admin users',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Create admin user (Admin only)
+ * @route   POST /api/admin/admin-users
+ * @access  Private/Admin
+ */
+export const createAdminUser = async (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, role, department, notes } = req.body;
+    
+    // Validate required fields
+    if (!firstName || !lastName || !email || !role) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide firstName, lastName, email, and role',
+      });
+    }
+    
+    // Validate admin role
+    if (!['admin', 'customer_service', 'support'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid admin role. Must be admin, customer_service, or support',
+      });
+    }
+    
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists',
+      });
+    }
+    
+    // Generate a random password (user will reset it via email)
+    const tempPassword = crypto.randomBytes(12).toString('hex');
+    
+    // Create admin user
+    const adminUser = await User.create({
+      firstName,
+      lastName,
+      email: email.toLowerCase(),
+      phone: phone || '',
+      password: tempPassword, // Will be hashed by pre-save hook
+      role: 'admin',
+      adminRole: role,
+      department: department || '',
+      notes: notes || '',
+      emailVerified: false,
+      isActive: true,
+      isBlocked: false,
+    });
+    
+    // Generate verification token and send email
+    const verificationToken = adminUser.generateEmailVerificationToken();
+    await adminUser.save({ validateBeforeSave: false });
+    
+    // Send verification email
+    try {
+      await sendVerificationEmail(adminUser.email, verificationToken, adminUser.firstName);
+      console.log(`Verification email sent to ${adminUser.email}`);
+    } catch (emailError) {
+      console.error('Error sending verification email:', emailError);
+      // Still return success but log the error - admin can resend if needed
+      // The user can still be created even if email fails
+    }
+    
+    const transformedUser = {
+      id: adminUser._id.toString(),
+      firstName: adminUser.firstName,
+      lastName: adminUser.lastName,
+      email: adminUser.email,
+      phone: adminUser.phone || '',
+      role: adminUser.adminRole || 'admin',
+      permissions: [],
+      status: 'active',
+      lastLogin: null,
+      createdAt: adminUser.createdAt,
+      createdBy: req.user.email || 'System',
+      department: adminUser.department || '',
+      notes: adminUser.notes || '',
+      emailVerified: false,
+    };
+    
+    res.status(201).json({
+      success: true,
+      message: 'Admin user created successfully. Verification email sent.',
+      data: {
+        user: transformedUser,
+      },
+    });
+  } catch (error) {
+    console.error('Create admin user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating admin user',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Update admin user (Admin only)
+ * @route   PUT /api/admin/admin-users/:id
+ * @access  Private/Admin
+ */
+export const updateAdminUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    // Don't allow updating own account status
+    if (id === req.user._id.toString() && (updates.status || updates.isActive || updates.isBlocked)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Cannot modify your own account status',
+      });
+    }
+    
+    const user = await User.findById(id);
+    if (!user || user.role !== 'admin') {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin user not found',
+      });
+    }
+    
+    // Map status to isActive and isBlocked
+    if (updates.status) {
+      if (updates.status === 'active') {
+        updates.isActive = true;
+        updates.isBlocked = false;
+      } else if (updates.status === 'inactive') {
+        updates.isActive = false;
+        updates.isBlocked = false;
+      } else if (updates.status === 'suspended') {
+        updates.isActive = false;
+        updates.isBlocked = true;
+      }
+      delete updates.status;
+    }
+    
+    // Map adminRole to role field
+    if (updates.role && ['admin', 'customer_service', 'support'].includes(updates.role)) {
+      updates.adminRole = updates.role;
+      delete updates.role;
+    }
+    
+    // Remove fields that shouldn't be updated directly
+    delete updates.password;
+    delete updates.email;
+    delete updates._id;
+    delete updates.id;
+    delete updates.createdAt;
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select('-password -emailVerificationToken -emailVerificationTokenExpiry -passwordResetToken -passwordResetTokenExpiry');
+    
+    const transformedUser = {
+      id: updatedUser._id.toString(),
+      firstName: updatedUser.firstName || '',
+      lastName: updatedUser.lastName || '',
+      email: updatedUser.email,
+      phone: updatedUser.phone || '',
+      role: updatedUser.adminRole || 'admin',
+      permissions: [],
+      status: updatedUser.isBlocked ? 'suspended' : (updatedUser.isActive ? 'active' : 'inactive'),
+      lastLogin: updatedUser.lastLogin || null,
+      createdAt: updatedUser.createdAt,
+      createdBy: 'System',
+      department: updatedUser.department || '',
+      notes: updatedUser.notes || '',
+      emailVerified: updatedUser.emailVerified || false,
+    };
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin user updated successfully',
+      data: {
+        user: transformedUser,
+      },
+    });
+  } catch (error) {
+    console.error('Update admin user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating admin user',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * @desc    Delete admin user (Admin only)
+ * @route   DELETE /api/admin/admin-users/:id
+ * @access  Private/Admin
+ */
+export const deleteAdminUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Don't allow deleting own account
+    if (id === req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Cannot delete your own account',
+      });
+    }
+    
+    const user = await User.findById(id);
+    if (!user || user.role !== 'admin') {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin user not found',
+      });
+    }
+    
+    await User.findByIdAndDelete(id);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin user deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete admin user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting admin user',
       error: error.message,
     });
   }

@@ -7,16 +7,12 @@ const userSchema = new mongoose.Schema(
     // Basic Information
     firstName: {
       type: String,
-      required: function() {
-        return this.role !== 'admin';
-      },
+      required: true,
       trim: true,
     },
     lastName: {
       type: String,
-      required: function() {
-        return this.role !== 'admin';
-      },
+      required: true,
       trim: true,
     },
     email: {
@@ -37,6 +33,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['patient', 'specialist', 'admin'],
       required: true,
+    },
+    // Admin sub-role (only for admin users)
+    adminRole: {
+      type: String,
+      enum: ['admin', 'customer_service', 'support'],
+      default: 'admin',
+    },
+    // Admin specific fields
+    department: {
+      type: String,
+      trim: true,
+    },
+    notes: {
+      type: String,
+      trim: true,
     },
     
     // Contact Information

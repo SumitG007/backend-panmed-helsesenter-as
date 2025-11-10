@@ -5,6 +5,10 @@ import {
   updateUser,
   resetUserPassword,
   sendVerificationEmailToUser,
+  getAllAdminUsers,
+  createAdminUser,
+  updateAdminUser,
+  deleteAdminUser,
 } from '../controllers/adminController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -30,6 +34,12 @@ router.get('/users/:id', adminOnly, getUserById);
 router.put('/users/:id', adminOnly, updateUser);
 router.post('/users/:id/reset-password', adminOnly, resetUserPassword);
 router.post('/users/:id/send-verification', adminOnly, sendVerificationEmailToUser);
+
+// Admin User Management Routes
+router.get('/admin-users', adminOnly, getAllAdminUsers);
+router.post('/admin-users', adminOnly, createAdminUser);
+router.put('/admin-users/:id', adminOnly, updateAdminUser);
+router.delete('/admin-users/:id', adminOnly, deleteAdminUser);
 
 export default router;
 
