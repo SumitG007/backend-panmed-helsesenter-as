@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import authRoutes from './routes/authRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,6 +58,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Debug: Log all routes
 console.log('📋 Registered routes:');

@@ -214,7 +214,8 @@ export const login = async (req, res) => {
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
-        message: 'Kontoen din har blitt deaktivert. Vennligst kontakt support.',
+        message: 'Kontoen din har blitt deaktivert. Vennligst kontakt administrator.',
+        code: 'ACCOUNT_INACTIVE',
       });
     }
 
@@ -222,7 +223,8 @@ export const login = async (req, res) => {
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
-        message: 'Kontoen din har blitt blokkert. Vennligst kontakt support.',
+        message: 'Kontoen din har blitt blokkert. Vennligst kontakt administrator.',
+        code: 'ACCOUNT_BLOCKED',
       });
     }
 
