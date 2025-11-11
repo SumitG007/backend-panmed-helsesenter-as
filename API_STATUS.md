@@ -15,6 +15,19 @@
 ### Upload APIs (Fully Implemented)
 - ✅ `POST /api/upload/profile-image` - Upload profile image
 
+### Admin APIs - User Management (Fully Implemented)
+- ✅ `GET /api/admin/users` - Get all users
+- ✅ `GET /api/admin/users/:id` - Get user details
+- ✅ `PUT /api/admin/users/:id` - Update user
+- ✅ `POST /api/admin/users/:id/reset-password` - Reset user password (sends email)
+- ✅ `POST /api/admin/users/:id/send-verification` - Send verification email
+
+### Admin APIs - Admin User Management (Fully Implemented - NEW)
+- ✅ `GET /api/admin/admin-users` - Get all admin users
+- ✅ `POST /api/admin/admin-users` - Create new admin user (sends verification email automatically)
+- ✅ `PUT /api/admin/admin-users/:id` - Update admin user
+- ✅ `DELETE /api/admin/admin-users/:id` - Delete admin user
+
 ---
 
 ## ❌ **Missing APIs (Need to be Implemented)**
@@ -50,13 +63,21 @@
 - ❌ `PUT /api/admin/profile-images/:id/reject` - Reject profile image
 
 ### 5. **Admin APIs - User Management**
-- ❌ `GET /api/admin/users` - Get all users
-- ❌ `GET /api/admin/users/:id` - Get user details
-- ❌ `PUT /api/admin/users/:id` - Update user
-- ❌ `PUT /api/admin/users/:id/activate` - Activate user
-- ❌ `PUT /api/admin/users/:id/deactivate` - Deactivate user
-- ❌ `PUT /api/admin/users/:id/block` - Block user
-- ❌ `DELETE /api/admin/users/:id` - Delete user
+- ✅ `GET /api/admin/users` - Get all users
+- ✅ `GET /api/admin/users/:id` - Get user details
+- ✅ `PUT /api/admin/users/:id` - Update user
+- ✅ `POST /api/admin/users/:id/reset-password` - Reset user password (sends email)
+- ✅ `POST /api/admin/users/:id/send-verification` - Send verification email
+- ❌ `PUT /api/admin/users/:id/activate` - Activate user (handled via status in update)
+- ❌ `PUT /api/admin/users/:id/deactivate` - Deactivate user (handled via status in update)
+- ❌ `PUT /api/admin/users/:id/block` - Block user (handled via status in update)
+- ❌ `DELETE /api/admin/users/:id` - Delete user (not implemented for regular users)
+
+### 5a. **Admin APIs - Admin User Management** (NEW)
+- ✅ `GET /api/admin/admin-users` - Get all admin users
+- ✅ `POST /api/admin/admin-users` - Create new admin user (sends verification email)
+- ✅ `PUT /api/admin/admin-users/:id` - Update admin user
+- ✅ `DELETE /api/admin/admin-users/:id` - Delete admin user
 
 ### 6. **Complaint Management APIs**
 - ❌ `POST /api/complaints` - Submit complaint
@@ -112,16 +133,17 @@
 
 ## 📊 **Summary**
 
-### ✅ **Working (2/13 categories)**
+### ✅ **Working (3/14 categories)**
 - Authentication: 8/8 APIs ✅
 - Upload: 1/1 APIs ✅
+- Admin - User Management: 5/7 APIs ✅ (Status changes handled via update endpoint)
+- Admin - Admin User Management: 4/4 APIs ✅ (NEW)
 
-### ❌ **Missing (11/13 categories)**
+### ❌ **Missing (11/14 categories)**
 - Appointment Management: 0/7 APIs ❌
 - Specialist Management: 0/8 APIs ❌
 - Admin - CV Management: 0/3 APIs ❌
 - Admin - Profile Image: 0/3 APIs ❌
-- Admin - User Management: 0/7 APIs ❌
 - Complaint Management: 0/6 APIs ❌
 - Rating & Review: 0/3 APIs ❌
 - Subscription Management: 0/5 APIs ❌
@@ -131,7 +153,7 @@
 - System Management: 0/6 APIs ❌
 - User Profile: 0/3 APIs ❌
 
-**Total: 9/63 APIs implemented (14%)**
+**Total: 18/68 APIs implemented (26%)**
 
 ---
 
@@ -147,7 +169,7 @@
 ### **Medium Priority**
 6. **Complaint Management** - User support feature
 7. **Rating & Review** - User feedback system
-8. **Admin - User Management** - Admin control panel
+8. **Admin - User Management** - Admin control panel ✅ (Partially implemented - basic CRUD done)
 
 ### **Lower Priority (Can be added later)**
 9. **Microsoft Teams Integration** - Video call functionality
@@ -161,9 +183,23 @@
 ## 📝 **Next Steps**
 
 1. **Fix Database Connection** ✅ (Already done - just need to whitelist IP in MongoDB Atlas)
-2. **Implement Appointment Management APIs** (Priority 1)
-3. **Implement Specialist Management APIs** (Priority 2)
-4. **Implement User Profile APIs** (Priority 3)
-5. **Implement Admin CV & Profile Image APIs** (Priority 4)
-6. **Connect Frontend to New APIs** (After each API is implemented)
+2. **Admin User Management** ✅ (Fully implemented with verification email flow)
+3. **Implement Appointment Management APIs** (Priority 1)
+4. **Implement Specialist Management APIs** (Priority 2)
+5. **Implement User Profile APIs** (Priority 3)
+6. **Implement Admin CV & Profile Image APIs** (Priority 4)
+7. **Connect Frontend to New APIs** (After each API is implemented)
+
+---
+
+## 🆕 **Recently Completed (Latest Updates)**
+
+### **Admin User Management System** ✅
+- ✅ Complete CRUD operations for admin users
+- ✅ Email verification flow for new admin users
+- ✅ Password reset functionality
+- ✅ Admin role management (admin, customer_service, support)
+- ✅ Frontend integration with bilingual support
+- ✅ Permission-based access control
+- ✅ Status management (active, inactive, suspended)
 
